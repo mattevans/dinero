@@ -1,5 +1,8 @@
 # dinero
 
+[![GoDoc](https://godoc.org/github.com/mattevans/dinero?status.svg)](https://godoc.org/github.com/mattevans/dinero)
+[![Build Status](https://travis-ci.org/mattevans/dinero.svg?branch=master)](https://travis-ci.org/mattevans/dinero)
+
 dinero is a [Go](http://golang.org) client library for accessing the Open Exchange Rates API (https://docs.openexchangerates.org/docs/).
 
 Upon request of forex rates these will be cached (in-memory), keyed by base currency. With a two hour expiry window, subsequent requests will use cached data or fetch fresh data accordingly.
