@@ -3,6 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/mattevans/dinero?status.svg)](https://godoc.org/github.com/mattevans/dinero)
 [![Build Status](https://travis-ci.org/mattevans/dinero.svg?branch=master)](https://travis-ci.org/mattevans/dinero)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mattevans/dinero)](https://goreportcard.com/report/github.com/mattevans/dinero)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/mattevans/dinero/blob/master/LICENSE)
 
 dinero is a [Go](http://golang.org) client library for accessing the Open Exchange Rates API (https://docs.openexchangerates.org/docs/).
 
