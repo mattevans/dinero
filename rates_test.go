@@ -4,6 +4,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	. "github.com/onsi/gomega"
 )
@@ -14,7 +15,7 @@ func TestListRates(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Init dinero client.
-	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD")
+	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD", 1*time.Minute)
 
 	// Get latest forex rates.
 	response, err := client.Rates.List()
@@ -37,7 +38,7 @@ func TestGetRate(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Init dinero client.
-	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD")
+	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD", 1*time.Minute)
 
 	// Get latest forex rates for NZD (using AUD as a base).
 	response, err := client.Rates.Get("NZD")

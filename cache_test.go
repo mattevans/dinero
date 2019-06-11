@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
+	"time"
 
 	. "github.com/onsi/gomega"
 )
@@ -14,7 +15,7 @@ func TestCache(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Init dinero client.
-	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD")
+	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD", 1*time.Minute)
 
 	// Get latest forex rates.
 	response1, err := client.Rates.List()
