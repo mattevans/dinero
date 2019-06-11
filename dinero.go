@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	packageVersion = "0.1.0"
+	packageVersion = "0.2.0"
 	backendURL     = "http://openexchangerates.org"
 	userAgent      = "dinero/" + packageVersion
 )
