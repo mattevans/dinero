@@ -21,9 +21,13 @@ const (
 
 // Client holds a connection to the OXR API.
 type Client struct {
-	client     *http.Client
-	AppID      string
-	UserAgent  string
+	// client is the HTTP client the package will use for requests.
+	client *http.Client
+	// AppID is the Open Exchange Rates application ID.
+	AppID string
+	// UserAgent is the UA for this package that all requests will use.
+	UserAgent string
+	// BackendURL is the base API endpoint at OXR.
 	BackendURL *url.URL
 
 	// Services used for communicating with the API.
@@ -31,33 +35,9 @@ type Client struct {
 	Cache *CacheService
 }
 
-type service struct {
-	client *Client
-}
-
-// Response is a OXR response. This wraps the standard http.Response
-// returned from the OXR API.
-type Response struct {
-	*http.Response
-	ErrorCode int64
-	Message   string
-}
-
-// An ErrorResponse reports the error caused by an API request
-type ErrorResponse struct {
-	*http.Response
-	ErrorCode   int64  `json:"status"`
-	Message     string `json:"message"`
-	Description string `json:"description"`
-}
-
-func (r *ErrorResponse) Error() string {
-	return fmt.Sprintf("%d %v", r.Response.StatusCode, r.Description)
-}
-
 // NewClient creates a new Client with the appropriate connection details and
 // services used for communicating with the API.
-func NewClient(appID, baseCurrency string) *Client {
+func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 	// Init new http.Client.
 	httpClient := http.DefaultClient
 
@@ -72,7 +52,7 @@ func NewClient(appID, baseCurrency string) *Client {
 	}
 
 	// Init a new store.
-	store := cache.New(5*time.Minute, 10*time.Minute)
+	store := cache.New(expiry, 10*time.Minute)
 
 	// Init services.
 	c.Rates = NewRatesService(c, baseCurrency)
@@ -154,6 +134,26 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 	}
 
 	return response, err
+}
+
+// Response is a OXR response. This wraps the standard http.Response
+// returned from the OXR API.
+type Response struct {
+	*http.Response
+	ErrorCode int64
+	Message   string
+}
+
+// An ErrorResponse reports the error caused by an API request
+type ErrorResponse struct {
+	*http.Response
+	ErrorCode   int64  `json:"status"`
+	Message     string `json:"message"`
+	Description string `json:"description"`
+}
+
+func (r *ErrorResponse) Error() string {
+	return fmt.Sprintf("%d %v", r.Response.StatusCode, r.Description)
 }
 
 // CheckResponse checks the API response for errors. A response is considered an
