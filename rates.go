@@ -33,7 +33,7 @@ func (s *RatesService) SetBaseCurrency(base string) {
 func (s *RatesService) All() (*RatesStore, error) {
 	// No base currency provided, let them know!
 	if baseCurrency == "" {
-		return nil, errors.New("Please set a base currency.")
+		return nil, errors.New("please set a base currency")
 	}
 
 	// If we have cached results, use them.
@@ -55,7 +55,7 @@ func (s *RatesService) All() (*RatesStore, error) {
 func (s *RatesService) Single(code string) (*float64, error) {
 	// No base currency provided, let them know!
 	if baseCurrency == "" || code == "" {
-		return nil, errors.New("Both the base currency and requested currency values must be set")
+		return nil, errors.New("both the base currency and requested currency values must be set")
 	}
 
 	// If we have cached results, use them.
