@@ -7,7 +7,7 @@
 
 dinero is a [Go](http://golang.org) client library for accessing the Open Exchange Rates API (https://docs.openexchangerates.org/docs/).
 
-Upon request of forex rates these will be cached (in-memory), keyed by base currency. With a two hour expiry window, subsequent requests will use cached data or fetch fresh data accordingly.
+Upon request of forex rates these will be cached (in-memory), keyed by base currency. With a customisable expiry window, subsequent requests will use cached data or fetch fresh data accordingly.
 
 Installation
 -----------------
@@ -17,17 +17,18 @@ Installation
 Usage
 -----------------
 
-**Get All**
+**List**
 
 ```go
-// Init dinero client.
-client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"))
+// Init dinero client, passing your OXR app ID and a base 
+// currency for conversion to work from.
+client := NewClient(
+  os.Getenv("OPEN_EXCHANGE_APP_ID"), 
+  "AUD",
+)
 
-// Set a base currency to work with.
-client.Rates.SetBaseCurrency("AUD")
-
-// Get latest forex rates using AUD as a base currency.
-response, err := client.Rates.All()
+// Get latest forex rates.
+rsp, err := client.Rates.List()
 if err != nil {
   return err
 }
@@ -36,30 +37,33 @@ if err != nil {
 ```json
 {
    "rates":{
-      "AED":2.702388,
-      "AFN":48.893275,
-      "ALL":95.142814,
-      "AMD":356.88691,
+      "AED": 2.702388,
+      "AFN": 48.893275,
+      "ALL": 95.142814,
+      "AMD": 356.88691,
       ...
    },
-   "updated_at":"2016-12-16T11:25:47.38290048+13:00",
-   "base":"AUD"
+   "base": "AUD"
 }
 ```
 
 ---
 
-**Get Single**
+**Get**
 
 ```go
-// Init dinero client.
-client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"))
+// Init dinero client, passing your OXR app ID and a base 
+// currency for conversion to work from.
+client := NewClient(
+  os.Getenv("OPEN_EXCHANGE_APP_ID"), 
+  "AUD",
+)
 
 // Set a base currency to work with.
 client.Rates.SetBaseCurrency("AUD")
 
 // Get latest forex rate for NZD using AUD as a base currency.
-response, err := client.Rates.Single("NZD")
+rsp, err := client.Rates.Single("NZD")
 if err != nil {
   return err
 }
@@ -71,9 +75,21 @@ if err != nil {
 
 ---
 
-**Expire in-memory cache**
+**Change Base Currency**
 
-The following will expire the in-memory cache for the set base currency.
+You set a base currency when your intialize dinero client. Should you wish to change this, you can call...
+
+```
+client.Rates.SetBaseCurrency("USD")
+```
+
+---
+
+**Expire**
+
+By default, cached rates will expire themselves based on your configured cache TTL.
+
+You can force an expiry of the rates for your currency set by calling...
 
 ```go
 client.Cache.Expire()
