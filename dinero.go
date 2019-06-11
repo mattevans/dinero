@@ -95,8 +95,6 @@ func (c *Client) request(method string, rel *url.URL, body interface{}) (*http.R
 	// Resolve to absolute URI.
 	u := c.BackendURL.ResolveReference(rel)
 
-	fmt.Printf("%+v\n", u)
-
 	buf := new(bytes.Buffer)
 	if body != nil {
 		err := json.NewEncoder(buf).Encode(body)
