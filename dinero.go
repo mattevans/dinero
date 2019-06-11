@@ -8,10 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
+
+	cache "github.com/patrickmn/go-cache"
 )
 
 const (
-	packageVersion = "0.2.0"
+	packageVersion = "0.3.0"
 	backendURL     = "http://openexchangerates.org"
 	userAgent      = "dinero/" + packageVersion
 )
@@ -24,9 +27,8 @@ type Client struct {
 	BackendURL *url.URL
 
 	// Services used for communicating with the API.
-	Rates  *RatesService
-	Update *UpdateService
-	Cache  *CacheService
+	Rates *RatesService
+	Cache *CacheService
 }
 
 type service struct {
@@ -55,7 +57,7 @@ func (r *ErrorResponse) Error() string {
 
 // NewClient creates a new Client with the appropriate connection details and
 // services used for communicating with the API.
-func NewClient(oxrAppID string) *Client {
+func NewClient(appID, baseCurrency string) *Client {
 	// Init new http.Client.
 	httpClient := http.DefaultClient
 
@@ -66,23 +68,26 @@ func NewClient(oxrAppID string) *Client {
 		client:     httpClient,
 		BackendURL: baseURL,
 		UserAgent:  userAgent,
-		AppID:      oxrAppID,
+		AppID:      appID,
 	}
 
-	c.Update = &UpdateService{client: c}
-	c.Rates = &RatesService{client: c}
-	c.Cache = &CacheService{client: c}
+	// Init a new store.
+	store := cache.New(5*time.Minute, 10*time.Minute)
+
+	// Init services.
+	c.Rates = NewRatesService(c, baseCurrency)
+	c.Cache = NewCacheService(c, store)
+
 	return c
 }
 
 // NewRequest creates an API request. A relative URL can be provided in urlPath,
 // which will be resolved to the BackendURL of the Client.
 func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Request, error) {
-	// Append out OXR App ID to URL, :-(
-	urlPath = fmt.Sprintf("%s&app_id=%s", urlPath, c.AppID)
-
 	// Parse our URL.
-	rel, err := url.Parse(urlPath)
+	rel, err := url.Parse(
+		fmt.Sprintf("%s&app_id=%s", urlPath, c.AppID),
+	)
 	if err != nil {
 		return nil, err
 	}
