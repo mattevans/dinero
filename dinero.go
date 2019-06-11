@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	packageVersion = "0.3.0"
-	backendURL     = "http://openexchangerates.org"
+	packageVersion = "0.4.0"
+	backendURL     = "https://openexchangerates.org"
 	userAgent      = "dinero/" + packageVersion
 )
 
@@ -31,8 +31,9 @@ type Client struct {
 	BackendURL *url.URL
 
 	// Services used for communicating with the API.
-	Rates *RatesService
-	Cache *CacheService
+	Rates      *RatesService
+	Currencies *CurrenciesService
+	Cache      *CacheService
 }
 
 // NewClient creates a new Client with the appropriate connection details and
@@ -56,28 +57,49 @@ func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 
 	// Init services.
 	c.Rates = NewRatesService(c, baseCurrency)
+	c.Currencies = NewCurrenciesService(c)
 	c.Cache = NewCacheService(c, store)
 
 	return c
 }
 
-// NewRequest creates an API request. A relative URL can be provided in urlPath,
+// NewRequest creates an authenticated API request. A relative URL can be provided in urlPath,
 // which will be resolved to the BackendURL of the Client.
 func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Request, error) {
 	// Parse our URL.
 	rel, err := url.Parse(
-		fmt.Sprintf("%s&app_id=%s", urlPath, c.AppID),
+		fmt.Sprintf("/api/%s&app_id=%s", urlPath, c.AppID),
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	return c.request(method, rel, body)
+}
+
+// NewUnauthedRequest creates an unauthenticated API request. A relative URL can be provided in urlPath,
+// which will be resolved to the BackendURL of the Client.
+func (c *Client) NewUnauthedRequest(method, urlPath string, body interface{}) (*http.Request, error) {
+	// Parse our URL.
+	rel, err := url.Parse(
+		fmt.Sprintf("/api/%s", urlPath),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.request(method, rel, body)
+}
+
+func (c *Client) request(method string, rel *url.URL, body interface{}) (*http.Request, error) {
 	// Resolve to absolute URI.
 	u := c.BackendURL.ResolveReference(rel)
 
+	fmt.Printf("%+v\n", u)
+
 	buf := new(bytes.Buffer)
 	if body != nil {
-		err = json.NewEncoder(buf).Encode(body)
+		err := json.NewEncoder(buf).Encode(body)
 		if err != nil {
 			return nil, err
 		}
