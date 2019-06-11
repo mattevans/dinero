@@ -33,6 +33,40 @@ client := NewClient(
 
 ---
 
+## Currencies
+
+**List**
+
+```go
+// List all currencies available.
+rsp, err := client.Currencies.List()
+if err != nil {
+  return err
+}
+```
+
+```json
+[
+  {
+    "code": "INR",
+    "name": "Indian Rupee"
+  },
+  {
+    "code": "PYG",
+    "name": "Paraguayan Guarani"
+  },
+  {
+      "code": "AED",
+      "name": "United Arab Emirates Dirham"
+  },
+  ...
+}
+```
+
+---
+
+## Rates
+
 **List**
 
 ```go
