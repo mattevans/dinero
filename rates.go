@@ -26,8 +26,8 @@ func NewRatesService(
 	}
 }
 
-// RateResposne holds our forex rates for a given base currency
-type RateResposne struct {
+// RateResponse holds our forex rates for a given base currency
+type RateResponse struct {
 	Rates     map[string]float64 `json:"rates"`
 	Base      string             `json:"base"`
 	Timestamp int64              `json:"timestamp"`
@@ -35,7 +35,7 @@ type RateResposne struct {
 
 // List will fetch all the latest rates for the base currency either from
 // the the store or the OXR api.
-func (s *RatesService) List() (*RateResposne, error) {
+func (s *RatesService) List() (*RateResponse, error) {
 	// If we have cached results, use them.
 	if results, ok := s.client.Cache.Get(s.baseCurrency); ok {
 		return results, nil
@@ -88,7 +88,7 @@ func (s *RatesService) Update(base string) error {
 	}
 
 	// Make request
-	latest := &RateResposne{}
+	latest := &RateResponse{}
 	if _, err = s.client.Do(request, latest); err != nil {
 		return err
 	}

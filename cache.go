@@ -24,15 +24,15 @@ func NewCacheService(
 }
 
 // Get will return our in-memory stored currency/rates.
-func (s *CacheService) Get(base string) (*RateResposne, bool) {
+func (s *CacheService) Get(base string) (*RateResponse, bool) {
 	if x, found := s.store.Get(base); found {
-		return x.(*RateResposne), found
+		return x.(*RateResponse), found
 	}
 	return nil, false
 }
 
 // Store will store our currency/rates in-memory.
-func (s *CacheService) Store(rsp *RateResposne) {
+func (s *CacheService) Store(rsp *RateResponse) {
 	// Set a stored timestamp.
 	rsp.Timestamp = time.Now().Unix()
 
