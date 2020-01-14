@@ -9,6 +9,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	ISO8601DateLayout = "2006-01-02"
+)
+
 // TestListRates will test updating our local store of forex rates from the OXR API.
 func TestListRates(t *testing.T) {
 	// Register the test.
@@ -21,6 +25,29 @@ func TestListRates(t *testing.T) {
 	response, err := client.Rates.List()
 	if err != nil {
 		t.Fatalf("Unexpected error running client.Rates.List(): %s", err.Error())
+	}
+
+	if response.Base != "AUD" {
+		t.Fatalf("Unexpected base oxr rate: %s. Expecting `AUD`.", err.Error())
+	}
+
+	if response.Rates == nil {
+		t.Fatalf("Unexpected length of rates: %s.", err.Error())
+	}
+}
+
+func TestGetHistoricalListRates(t *testing.T) {
+	// Register the test.
+	RegisterTestingT(t)
+
+	// Init dinero client.
+	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD", 1*time.Minute)
+
+	// Get forex rates for today
+	date := time.Now().Format(ISO8601DateLayout)
+	response, err := client.Rates.GetHistoricalList(date)
+	if err != nil {
+		t.Fatalf("Unexpected error running client.Rates.GetHistoricalList(): %s", err.Error())
 	}
 
 	if response.Base != "AUD" {
