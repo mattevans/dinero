@@ -3,10 +3,12 @@ package dinero
 import (
 	"errors"
 	"fmt"
+	"time"
 )
 
 const (
-	latestAPIPath = "latest.json"
+	latestAPIPath     = "latest.json"
+	historicalAPIPath = "historical/%s.json"
 )
 
 // RatesService handles rate request/responses.
@@ -107,4 +109,24 @@ func (s *RatesService) GetBaseCurrency() string {
 // SetBaseCurrency will set the base currency to be used for requests.
 func (s *RatesService) SetBaseCurrency(base string) {
 	s.baseCurrency = base
+}
+
+// GetHistoricalList will fetch all rates for the date for the base currency
+func (s *RatesService) GetHistoricalList(date string) (*RateResponse, error) {
+	if _, err := time.Parse("2006-01-02", date); err != nil {
+		return nil, err
+	}
+	apiPath := fmt.Sprintf(historicalAPIPath, date)
+	request, err := s.client.NewRequest(
+		"GET",
+		fmt.Sprintf("%s?base=%s", apiPath, s.baseCurrency),
+		nil)
+	if err != nil {
+		return nil, err
+	}
+	response := &RateResponse{}
+	if _, err := s.client.Do(request, response); err != nil {
+		return nil, err
+	}
+	return response, nil
 }

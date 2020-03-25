@@ -9,6 +9,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	ISO8601DateLayout = "2006-01-02"
+)
+
 // TestListRates will test updating our local store of forex rates from the OXR API.
 func TestListRates(t *testing.T) {
 	// Register the test.
