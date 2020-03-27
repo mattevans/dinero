@@ -9,6 +9,11 @@ const (
 	latestAPIPath = "latest.json"
 )
 
+var (
+	// ErrRatesNotFound is returned if no rate can be found for a given currency code.
+	ErrRatesNotFound = errors.New("no rates found for code")
+)
+
 // RatesService handles rate request/responses.
 type RatesService struct {
 	client       *Client
@@ -59,8 +64,10 @@ func (s *RatesService) Get(code string) (*float64, error) {
 
 	// If we have cached results, use them.
 	if results, ok := s.client.Cache.Get(s.baseCurrency); ok {
-		single := results.Rates[code]
-		return &single, nil
+		if single, ok := results.Rates[code]; ok {
+			return &single, nil
+		}
+		return nil, ErrRatesNotFound
 	}
 
 	// No cached results, go and fetch them.
