@@ -65,10 +65,12 @@ func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 
 // NewRequest creates an authenticated API request. A relative URL can be provided in urlPath,
 // which will be resolved to the BackendURL of the Client.
-func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlPath string, params url.Values, body interface{}) (*http.Request, error) {
+	// make sure rendered URL is correct whether we have other params than app_id or not
+	params.Set("app_id", c.AppID)
 	// Parse our URL.
 	rel, err := url.Parse(
-		fmt.Sprintf("/api/%s&app_id=%s", urlPath, c.AppID),
+		fmt.Sprintf("/api/%s?%s", urlPath, params.Encode()),
 	)
 	if err != nil {
 		return nil, err
