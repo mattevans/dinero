@@ -3,6 +3,7 @@ package dinero
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,6 +20,11 @@ const (
 	userAgent      = "dinero/" + packageVersion
 )
 
+var (
+	// ErrRatesNotFound is returned if no rate can be found for a given currency code.
+	ErrRatesNotFound = errors.New("no rates found for code")
+)
+
 // Client holds a connection to the OXR API.
 type Client struct {
 	// client is the HTTP client the package will use for requests.
@@ -32,6 +38,7 @@ type Client struct {
 
 	// Services used for communicating with the API.
 	Rates      *RatesService
+	HistoricalRates      *HistoricalRatesService
 	Currencies *CurrenciesService
 	Cache      *CacheService
 }
@@ -57,6 +64,7 @@ func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 
 	// Init services.
 	c.Rates = NewRatesService(c, baseCurrency)
+	c.HistoricalRates = NewHistoricalRatesService(c, baseCurrency)
 	c.Currencies = NewCurrenciesService(c)
 	c.Cache = NewCacheService(c, store)
 

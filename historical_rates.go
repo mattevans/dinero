@@ -8,83 +8,57 @@ import (
 )
 
 const (
-	latestAPIPath = "latest.json"
+	historicalAPIPath = "historical/%s.json"
 )
 
-// RatesService handles rate request/responses.
-type RatesService struct {
+// HistoricalRatesService handles historical rate request/responses.
+type HistoricalRatesService struct {
 	client       *Client
 	baseCurrency string
 }
 
-// NewRatesService creates a new handler for this service.
-func NewRatesService(
+// NewHistoricalRatesService creates a new handler for this service.
+func NewHistoricalRatesService(
 	client *Client,
 	baseCurrency string,
-) *RatesService {
-	return &RatesService{
+) *HistoricalRatesService {
+	return &HistoricalRatesService{
 		client:       client,
 		baseCurrency: baseCurrency,
 	}
 }
 
-// RateResponse holds our forex rates for a given base currency
-type RateResponse struct {
+// HistoricalRatesResponse holds our forex rates for a given base currency
+type HistoricalRatesResponse struct {
 	Rates     map[string]float64 `json:"rates"`
 	Base      string             `json:"base"`
 	Timestamp int64              `json:"timestamp"`
 }
 
 // List will fetch all the latest rates for the base currency either from the store or the OXR api.
-func (s *RatesService) List() (*RateResponse, error) {
+func (s *HistoricalRatesService) List(date time.Time) (*RateResponse, error) {
 	// If we have cached results, use them.
-	if results, ok := s.client.Cache.Get(s.baseCurrency, time.Now()); ok {
+	if results, ok := s.client.Cache.Get(s.baseCurrency, date); ok {
 		return results, nil
 	}
 
 	// No cached results, go and fetch them.
-	if err := s.fetch(); err != nil {
+	if err := s.fetch(date); err != nil {
 		return nil, err
 	}
 
-	return s.List()
-}
-
-// ListHistorical will fetch all rates for the base currency for the given time.Time.
-func (s *RatesService) ListHistorical(date time.Time) (*RateResponse, error) {
-	// add `base` query param if it is not empty.
-	params := url.Values{}
-	if s.baseCurrency != "" {
-		params.Set("base", s.baseCurrency)
-	}
-
-	request, err := s.client.NewRequest(
-		"GET",
-		fmt.Sprintf(historicalAPIPath, date.Format("2006-01-02")),
-		params,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &RateResponse{}
-	if _, err := s.client.Do(request, response); err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	return s.List(date)
 }
 
 // Get will fetch a single rate for a given currency either from the store or the OXR api.
-func (s *RatesService) Get(code string) (*float64, error) {
+func (s *HistoricalRatesService) Get(code string, date time.Time) (*float64, error) {
 	// No code passed, let them know!
 	if code == "" {
 		return nil, errors.New("currency code must be passed")
 	}
 
 	// If we have cached results, use them.
-	if results, ok := s.client.Cache.Get(s.baseCurrency, time.Now()); ok {
+	if results, ok := s.client.Cache.Get(s.baseCurrency, date); ok {
 		if single, ok := results.Rates[code]; ok {
 			return &single, nil
 		}
@@ -92,24 +66,24 @@ func (s *RatesService) Get(code string) (*float64, error) {
 	}
 
 	// No cached results, go and fetch them.
-	if err := s.fetch(); err != nil {
+	if err := s.fetch(date); err != nil {
 		return nil, err
 	}
 
-	return s.Get(code)
+	return s.Get(code, date)
 }
 
 // GetBaseCurrency will return the baseCurrency.
-func (s *RatesService) GetBaseCurrency() string {
+func (s *HistoricalRatesService) GetBaseCurrency() string {
 	return s.baseCurrency
 }
 
 // SetBaseCurrency will set the base currency to be used for requests.
-func (s *RatesService) SetBaseCurrency(base string) {
+func (s *HistoricalRatesService) SetBaseCurrency(base string) {
 	s.baseCurrency = base
 }
 
-func (s *RatesService) fetch() error {
+func (s *HistoricalRatesService) fetch(date time.Time) error {
 	// Build request.
 	// add `base` query param if it is not empty
 	params := url.Values{}
@@ -118,7 +92,7 @@ func (s *RatesService) fetch() error {
 	}
 	request, err := s.client.NewRequest(
 		"GET",
-		latestAPIPath,
+		fmt.Sprintf(historicalAPIPath, date.Format("2006-01-02")),
 		params,
 		nil,
 	)
@@ -135,7 +109,7 @@ func (s *RatesService) fetch() error {
 	s.SetBaseCurrency(latest.Base)
 
 	// Store our results.
-	s.client.Cache.Store(latest, time.Now())
+	s.client.Cache.Store(latest, date)
 
 	return nil
 }
