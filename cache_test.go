@@ -2,7 +2,7 @@ package dinero
 
 import (
 	"encoding/json"
-	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,14 +12,17 @@ import (
 // TestCache will test that our in-memory cache of forex results is working.
 func TestCache(t *testing.T) {
 	// Register the test.
-	RegisterTestingT(t)
+	NewWithT(t)
 
 	// Init dinero client.
-	client := NewClient(os.Getenv("OPEN_EXCHANGE_APP_ID"), "AUD", 1*time.Minute)
+	client := NewClient(appID, "AUD", 1*time.Minute)
 
 	// Get latest forex rates.
 	response1, err := client.Rates.List()
 	if err != nil {
+		if strings.HasPrefix(err.Error(), setBaseNotAllowedResponsePrefix) {
+			t.Skipf("skipping test, unsuitable app ID: %s", err)
+		}
 		t.Fatalf("Unexpected error running client.Rates.List(): %s", err.Error())
 	}
 
