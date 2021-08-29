@@ -70,8 +70,7 @@ if err != nil {
 **List**
 
 ```go
-// List latest forex rates. This will use AUD (defined 
-// when intializing the client) as the base.
+// List latest forex rates. This will use AUD (defined when intializing the client) as the base.
 rsp, err := client.Rates.List()
 if err != nil {
   return err
@@ -96,9 +95,54 @@ if err != nil {
 **Get**
 
 ```go
-// Get latest forex rate for NZD. This will use AUD (defined 
-// when intializing the client) as the base.
+// Get latest forex rate for NZD. This will use AUD (defined when intializing the client) as the base.
 rsp, err := client.Rates.Get("NZD")
+if err != nil {
+  return err
+}
+```
+
+```
+1.045545
+```
+---
+
+## Historical Rates
+
+**List**
+
+```go
+historicalDate := time.Now().AddDate(0, -5, -3)
+
+// List historical forex rates. This will use AUD (defined when intializing the client) as the base.
+rsp, err := client.Historical.List(historicalDate)
+if err != nil {
+  return err
+}
+```
+
+```json
+{
+   "rates":{
+      "AED": 2.702388,
+      "AFN": 48.893275,
+      "ALL": 95.142814,
+      "AMD": 356.88691,
+      ...
+   },
+   "base": "AUD"
+}
+```
+
+---
+
+**Get**
+
+```go
+historicalDate := time.Now().AddDate(0, -5, -3)
+
+// Get historical forex rate for NZD. This will use AUD (defined when intializing the client) as the base.
+rsp, err := client.Rates.Get("NZD", historicalDate)
 if err != nil {
   return err
 }
