@@ -130,6 +130,11 @@ You can force an expiry of the rates for your currency set by calling...
 client.Cache.Expire()
 ```
 
+Additional Requirements
+-----------------------
+Due to an update to Open Exchange Rate's subscription plans you will require at least a "Developer" level plan to access
+the required API endpoints.
+
 Contributing
 -----------------
 If you've found a bug or would like to contribute, please create an issue here on GitHub, or better yet fork the project and submit a pull request!
