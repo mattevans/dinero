@@ -97,8 +97,11 @@ func TestListHistoricalRates(t *testing.T) {
 	// Init dinero client.
 	client := NewClient(appID, "USD", 1*time.Minute)
 
+	historicalDateStr := "2012-07-10"
+	historicalDateTime, _ := time.Parse("2006-01-02", historicalDateStr)
+
 	// Get yesterdays forex rates.
-	response, err := client.Rates.ListHistorical(time.Now().AddDate(0,0,1))
+	response, err := client.Rates.ListHistorical(historicalDateTime)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), setBaseNotAllowedResponsePrefix) {
 			t.Skipf("skipping test, unsuitable app ID: %s", err)
