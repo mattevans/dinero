@@ -37,10 +37,10 @@ type Client struct {
 	BackendURL *url.URL
 
 	// Services used for communicating with the API.
-	Rates      *RatesService
-	HistoricalRates      *HistoricalRatesService
-	Currencies *CurrenciesService
-	Cache      *CacheService
+	Rates           *RatesService
+	HistoricalRates *HistoricalRatesService
+	Currencies      *CurrenciesService
+	Cache           *CacheService
 }
 
 // NewClient creates a new Client with the appropriate connection details and
