@@ -115,7 +115,7 @@ if err != nil {
 historicalDate := time.Now().AddDate(0, -5, -3)
 
 // List historical forex rates. This will use AUD (defined when intializing the client) as the base.
-rsp, err := client.Historical.List(historicalDate)
+rsp, err := client.HistoricalRates.List(historicalDate)
 if err != nil {
   return err
 }
@@ -142,7 +142,7 @@ if err != nil {
 historicalDate := time.Now().AddDate(0, -5, -3)
 
 // Get historical forex rate for NZD. This will use AUD (defined when intializing the client) as the base.
-rsp, err := client.Rates.Get("NZD", historicalDate)
+rsp, err := client.HistoricalRates.Get("NZD", historicalDate)
 if err != nil {
   return err
 }
@@ -165,16 +165,6 @@ client.Rates.SetBaseCurrency("USD")
 > NOTE: Changing the API `base` currency is available for Developer, Enterprise and Unlimited plan clients only.
 
 ---
-
-**Expire**
-
-You set your preferred cache expiry interval when you intialize the dinero client. By default, cached rates will expire themselves based on your configured interval.
-
-You can force an expiry of the rates for your currency set by calling...
-
-```go
-client.Cache.Expire()
-```
 
 Contributing
 -----------------
