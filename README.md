@@ -118,6 +118,8 @@ You set a base currency when you the intialize dinero client. Should you wish to
 client.Rates.SetBaseCurrency("USD")
 ```
 
+> NOTE: Changing the API `base` currency is available for Developer, Enterprise and Unlimited plan clients only.
+
 ---
 
 **Expire**

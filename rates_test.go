@@ -13,6 +13,7 @@ import (
 const (
 	// Default currency returned by API calls that do not set a base currency.
 	defaultCurrency = "USD"
+	// "Free" OXR plans don't allow switching of base currency.
 	// > 403 Changing the API `base` currency is available for Developer, Enterprise and Unlimited plan clients.
 	setBaseNotAllowedResponsePrefix = "403"
 )
