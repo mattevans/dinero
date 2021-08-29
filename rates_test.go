@@ -89,6 +89,32 @@ func TestListRates(t *testing.T) {
 	}
 }
 
+// TestListRates will test rates for the base currency for the given time.Time.
+func TestListHistoricalRates(t *testing.T) {
+	// Register the test.
+	NewWithT(t)
+
+	// Init dinero client.
+	client := NewClient(appID, "USD", 1*time.Minute)
+
+	// Get yesterdays forex rates.
+	response, err := client.Rates.ListHistorical(time.Now().AddDate(0,0,1))
+	if err != nil {
+		if strings.HasPrefix(err.Error(), setBaseNotAllowedResponsePrefix) {
+			t.Skipf("skipping test, unsuitable app ID: %s", err)
+		}
+		t.Fatalf("Unexpected error running client.Rates.ListHistorical(): %s", err)
+	}
+
+	if response.Base != "USD" {
+		t.Fatal("Unexpected base oxr rate. Expecting `USD`.")
+	}
+
+	if response.Rates == nil {
+		t.Fatal("Unexpected length of historical rates")
+	}
+}
+
 // TestGetRate will test pulling a single rate.
 func TestGetRate(t *testing.T) {
 	// Register the test.

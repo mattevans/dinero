@@ -2,11 +2,14 @@ package dinero
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
+	"time"
 )
 
 const (
 	latestAPIPath = "latest.json"
+	historicalAPIPath = "historical/%s.json"
 )
 
 var (
@@ -52,6 +55,32 @@ func (s *RatesService) List() (*RateResponse, error) {
 	}
 
 	return s.List()
+}
+
+// ListHistorical will fetch all rates for the base currency for the given time.Time.
+func (s *RatesService) ListHistorical(date time.Time) (*RateResponse, error) {
+	// add `base` query param if it is not empty.
+	params := url.Values{}
+	if s.baseCurrency != "" {
+		params.Set("base", s.baseCurrency)
+	}
+
+	request, err := s.client.NewRequest(
+		"GET",
+		fmt.Sprintf(historicalAPIPath, date.Format("2006-01-02")),
+		params,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RateResponse{}
+	if _, err := s.client.Do(request, response); err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 // Get will fetch a single rate for a given currency either from
