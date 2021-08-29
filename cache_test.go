@@ -27,7 +27,7 @@ func TestCache(t *testing.T) {
 	}
 
 	// Fetch results again
-	response2, ok := client.Cache.Get("AUD")
+	response2, ok := client.Cache.Get("AUD", time.Now())
 	if !ok {
 		t.Fatalf("Expected response when fetching from cache for base currency AUD, got: %v", response2)
 	}
@@ -37,10 +37,10 @@ func TestCache(t *testing.T) {
 	Expect(first).To(MatchJSON(second))
 
 	// Expire the cache
-	client.Cache.Expire("AUD")
+	client.Cache.Expire("AUD", time.Now())
 
 	// Fetch results again (from the cache), now it's cleared.
-	response2, _ = client.Cache.Get("AUD")
+	response2, _ = client.Cache.Get("AUD", time.Now())
 
 	// Should be nothing.
 	Expect(response2).Should(BeNil())

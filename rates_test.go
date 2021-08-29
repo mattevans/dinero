@@ -1,7 +1,6 @@
 package dinero
 
 import (
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -10,18 +9,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
-	// Default currency returned by API calls that do not set a base currency.
-	defaultCurrency = "USD"
-	// "Free" OXR plans don't allow switching of base currency.
-	// > 403 Changing the API `base` currency is available for Developer, Enterprise and Unlimited plan clients.
-	setBaseNotAllowedResponsePrefix = "403"
-)
-
-var appID = os.Getenv("OPEN_EXCHANGE_APP_ID")
-
-// TestListRatesDefaultCurrency will test updating our local store of forex rates from the OXR API expecting rates for defaultCurrency.
-func TestListRatesDefaultCurrency(t *testing.T) {
+// TestRatesDefaultCurrency_List will test updating our local store of forex rates from the OXR API expecting rates for defaultCurrency.
+func TestRatesDefaultCurrency_List(t *testing.T) {
 	// Register the test.
 	NewWithT(t)
 
@@ -43,8 +32,8 @@ func TestListRatesDefaultCurrency(t *testing.T) {
 	}
 }
 
-// TestGetRateDefaultCurrency will test pulling a single rate for defaultCurrency.
-func TestGetRateDefaultCurrency(t *testing.T) {
+// TestRatesDefaultCurrency_Get will test pulling a single rate for defaultCurrency.
+func TestRatesDefaultCurrency_Get(t *testing.T) {
 	// Register the test.
 	NewWithT(t)
 
@@ -63,8 +52,8 @@ func TestGetRateDefaultCurrency(t *testing.T) {
 	}
 }
 
-// TestListRates will test updating our local store of forex rates from the OXR API.
-func TestListRates(t *testing.T) {
+// TestRates_List will test updating our local store of forex rates from the OXR API.
+func TestRates_List(t *testing.T) {
 	// Register the test.
 	NewWithT(t)
 
@@ -89,37 +78,8 @@ func TestListRates(t *testing.T) {
 	}
 }
 
-// TestListRates will test rates for the base currency for the given time.Time.
-func TestListHistoricalRates(t *testing.T) {
-	// Register the test.
-	NewWithT(t)
-
-	// Init dinero client.
-	client := NewClient(appID, "USD", 1*time.Minute)
-
-	historicalDateStr := "2012-07-10"
-	historicalDateTime, _ := time.Parse("2006-01-02", historicalDateStr)
-
-	// Get yesterdays forex rates.
-	response, err := client.Rates.ListHistorical(historicalDateTime)
-	if err != nil {
-		if strings.HasPrefix(err.Error(), setBaseNotAllowedResponsePrefix) {
-			t.Skipf("skipping test, unsuitable app ID: %s", err)
-		}
-		t.Fatalf("Unexpected error running client.Rates.ListHistorical(): %s", err)
-	}
-
-	if response.Base != "USD" {
-		t.Fatal("Unexpected base oxr rate. Expecting `USD`.")
-	}
-
-	if response.Rates == nil {
-		t.Fatal("Unexpected length of historical rates")
-	}
-}
-
-// TestGetRate will test pulling a single rate.
-func TestGetRate(t *testing.T) {
+// TestRates_Get will test pulling a single rate.
+func TestRates_Get(t *testing.T) {
 	// Register the test.
 	NewWithT(t)
 

@@ -3,6 +3,7 @@ package dinero
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,9 +15,14 @@ import (
 )
 
 const (
-	packageVersion = "0.7.1"
+	packageVersion = "0.8.0"
 	backendURL     = "https://openexchangerates.org"
 	userAgent      = "dinero/" + packageVersion
+)
+
+var (
+	// ErrRatesNotFound is returned if no rate can be found for a given currency code.
+	ErrRatesNotFound = errors.New("no rates found for code")
 )
 
 // Client holds a connection to the OXR API.
@@ -31,9 +37,10 @@ type Client struct {
 	BackendURL *url.URL
 
 	// Services used for communicating with the API.
-	Rates      *RatesService
-	Currencies *CurrenciesService
-	Cache      *CacheService
+	Rates           *RatesService
+	HistoricalRates *HistoricalRatesService
+	Currencies      *CurrenciesService
+	Cache           *CacheService
 }
 
 // NewClient creates a new Client with the appropriate connection details and
@@ -57,6 +64,7 @@ func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 
 	// Init services.
 	c.Rates = NewRatesService(c, baseCurrency)
+	c.HistoricalRates = NewHistoricalRatesService(c, baseCurrency)
 	c.Currencies = NewCurrenciesService(c)
 	c.Cache = NewCacheService(c, store)
 

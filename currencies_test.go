@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// TestListCurrencies will test listing currencies from the OXR api.
-func TestListCurrencies(t *testing.T) {
+// TestCurrencies_List will test listing currencies from the OXR api.
+func TestCurrencies_List(t *testing.T) {
 	// Register the test.
 	RegisterTestingT(t)
 
