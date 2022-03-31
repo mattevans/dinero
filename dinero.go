@@ -71,6 +71,37 @@ func NewClient(appID, baseCurrency string, expiry time.Duration) *Client {
 	return c
 }
 
+func NewPipoClient(appID, baseCurrency string, expiry time.Duration, client *http.Client) *Client  {
+	var httpClient *http.Client
+	// Init new http.Client.
+	if client != nil {
+		httpClient = client
+	} else {
+		httpClient = http.DefaultClient
+	}
+	// Parse BE URL.
+	baseURL, _ := url.Parse(backendURL)
+
+	c := &Client{
+		client:     httpClient,
+		BackendURL: baseURL,
+		UserAgent:  userAgent,
+		AppID:      appID,
+	}
+
+	// Init a new store.
+	store := cache.New(expiry, 10*time.Minute)
+
+	// Init services.
+	c.Rates = NewRatesService(c, baseCurrency)
+	c.HistoricalRates = NewHistoricalRatesService(c, baseCurrency)
+	c.Currencies = NewCurrenciesService(c)
+	c.Cache = NewCacheService(c, store)
+
+	return c
+
+}
+
 // NewRequest creates an authenticated API request. A relative URL can be provided in urlPath,
 // which will be resolved to the BackendURL of the Client.
 func (c *Client) NewRequest(method, urlPath string, params url.Values, body interface{}) (*http.Request, error) {
